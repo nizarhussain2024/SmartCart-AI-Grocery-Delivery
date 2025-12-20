@@ -332,3 +332,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
+
+## AI/NLP Capabilities
+
+This project includes AI and NLP utilities for:
+- Text processing and tokenization
+- Similarity calculation
+- Natural language understanding
+
+*Last updated: 2025-12-20*

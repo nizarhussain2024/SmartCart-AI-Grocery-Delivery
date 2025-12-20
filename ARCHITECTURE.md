@@ -312,3 +312,12 @@ SmartCart is an AI-powered grocery delivery platform that leverages machine lear
 - **Multi-vendor Support**: Marketplace functionality
 - **Subscription Orders**: Recurring order management
 
+
+## AI Components
+
+### NLP Processing
+- Text tokenization and normalization
+- Similarity calculation algorithms
+- Context-aware processing
+
+*Updated: 2025-12-20*
