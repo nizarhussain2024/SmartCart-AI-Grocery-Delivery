@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,15 +50,21 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = ["All", ...new Set(products.map(p => p.category))];
+  const categories = useMemo(() => 
+    ["All", ...new Set(products.map(p => p.category))], 
+    []
+  );
 
-  const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = useMemo(() => 
+    products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    }),
+    [searchQuery, selectedCategory]
+  );
 
-  const addToCart = (product: Product) => {
+  const addToCart = useCallback((product: Product) => {
     if (!product.inStock) {
       toast({ title: "Out of Stock", description: `${product.name} is currently unavailable`, variant: "destructive" });
       return;
@@ -71,9 +77,9 @@ const Index = () => {
       return [...prev, { ...product, quantity: 1 }];
     });
     toast({ title: "Added to Cart", description: `${product.name} added successfully` });
-  };
+  }, []);
 
-  const updateQuantity = (id: number, delta: number) => {
+  const updateQuantity = useCallback((id: number, delta: number) => {
     setCart(prev => prev.map(item => {
       if (item.id === id) {
         const newQty = item.quantity + delta;
@@ -81,14 +87,21 @@ const Index = () => {
       }
       return item;
     }).filter(item => item.quantity > 0));
-  };
+  }, []);
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = useCallback((id: number) => {
     setCart(prev => prev.filter(item => item.id !== id));
-  };
+  }, []);
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryFee = cartTotal > 35 ? 0 : 4.99;
+  const cartTotal = useMemo(() => 
+    cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart]
+  );
+  
+  const deliveryFee = useMemo(() => 
+    cartTotal > 35 ? 0 : 4.99,
+    [cartTotal]
+  );
 
   return (
     <>
@@ -147,6 +160,8 @@ const Index = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 bg-card border-emerald-800/50"
+                    aria-label="Search groceries"
+                    role="searchbox"
                   />
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -191,6 +206,7 @@ const Index = () => {
                           onClick={() => addToCart(product)}
                           disabled={!product.inStock}
                           className="bg-emerald-600 hover:bg-emerald-700"
+                          aria-label={`Add ${product.name} to cart`}
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
